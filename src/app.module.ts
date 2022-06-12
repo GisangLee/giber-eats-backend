@@ -1,5 +1,6 @@
+import { JwtMiddleware } from './jwt/jwt.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,6 +10,7 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { User } from './users/entities/user.entity';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
     imports: [
@@ -23,6 +25,7 @@ import { User } from './users/entities/user.entity';
                 DB_username: Joi.string().required(),
                 DB_password: Joi.string().required(),
                 DB_database: Joi.string().required(),
+                SECRET_KEY: Joi.string().required(),
             })
         }),
         TypeOrmModule.forRoot({
@@ -40,10 +43,20 @@ import { User } from './users/entities/user.entity';
             driver: ApolloDriver,
             autoSchemaFile: true
         }),
+        JwtModule.forRoot({
+            privateKey: process.env.SECRET_KEY
+        }),
         UsersModule,
         CommonModule,
     ],
     controllers: [],
     providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(JwtMiddleware).forRoutes({
+            path: "*",
+            method: RequestMethod.ALL,
+        });
+    }
+}

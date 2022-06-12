@@ -1,15 +1,19 @@
+import { JwtService } from './../jwt/jwt.service';
+import { ConfigService } from '@nestjs/config';
 import { LoginInput } from './dto/login.dto';
-import { CreateAccountInput, CreateAccountOutput } from './dto/create-account.dto';
+import { CreateAccountInput } from './dto/create-account.dto';
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import * as jwt from "jsonwebtoken";
 import { User } from "./entities/user.entity";
 
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User) private readonly users: Repository<User>
+        @InjectRepository(User) private readonly users: Repository<User>,
+        private readonly jwtService: JwtService
     ){}
 
     async createAccount(createAccountInput: CreateAccountInput): Promise<{ok:boolean, error?:string}>{
@@ -76,9 +80,13 @@ export class UsersService {
                 }
             }
 
+            const expireAt = new Date().setDate(new Date().getDate() + 30);
+
+            const token = this.jwtService.sign({id: foundUser.id, expireAt: expireAt })
+
             return {
                 ok: true,
-                token: "lalalalala"
+                token
             }
 
             // create JWT
