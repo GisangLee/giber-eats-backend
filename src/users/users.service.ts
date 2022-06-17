@@ -7,6 +7,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as jwt from "jsonwebtoken";
 import { User } from "./entities/user.entity";
+import { EditProfileInput } from './dto/editProfile.dto';
+import { UserInputError } from 'apollo-server-express';
 
 
 @Injectable()
@@ -98,5 +100,18 @@ export class UsersService {
 
     async findById(id: number): Promise<User>{
         return this.users.findOneBy({ id });
+    }
+
+    async editProfile(id: number, { email, password }: EditProfileInput) {
+        const user = await this.users.findOneBy({ id });
+
+        if (email){
+            user.email = email;
+        }
+        if (password){
+            user.password = password;
+        }
+        
+        return this.users.save(user);
     }
 }
