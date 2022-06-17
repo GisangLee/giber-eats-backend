@@ -3,6 +3,10 @@ import { CreateAccountInput, CreateAccountOutput } from './dto/create-account.dt
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { User } from "./entities/user.entity";
 import { UsersService } from "./users.service";
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { UserProfileInput, UserProfileOutput } from './dto/user-profile.dto';
 
 
 
@@ -56,11 +60,33 @@ export class UsersResolver{
     }
 
     @Query(returns => User)
-    me(@Context() context){
-        if (!context.user){
-            return;
-        }else {
-            return context.user;
+    @UseGuards(AuthGuard)
+    me(@AuthUser() authUser: User){
+        return authUser;
+    }   
+    
+    @UseGuards(AuthGuard)
+    @Query(returns => UserProfileOutput)
+    async userProfile(@Args() userProfileInput: UserProfileInput): Promise<UserProfileOutput>{
+        try {
+            const user = await this.usersService.findById(userProfileInput.userId);
+            
+            if (!user){
+                throw Error();
+            }
+
+            return {
+                ok: Boolean(user),
+                user
+            };
+
+        } catch (error) {
+            return {
+                error: "사용자를 찾을 수 없습니다.",
+                ok: false
+            };
         }
+        
     }
+    
 }
