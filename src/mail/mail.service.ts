@@ -43,7 +43,7 @@ export class MailService {
             "이메일 인증",
             "giber-eats-confirm-email",
             [
-                { "key": "code", "value": code },
+                {"key": "code", "value": code },
                 {"key": "username", "value": email}
             ],
             "kisang6710@gmail.com"
