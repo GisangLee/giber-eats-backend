@@ -20,7 +20,7 @@ The Backend of Giber Eats
 - Edit Profile [x]
 - Verify Email [x]
 
-## Restaurant Model
+## Restaurant Entity
 
 - name
 - category
@@ -37,13 +37,25 @@ The Backend of Giber Eats
 - Edit Restaurant [x]
 - Delete Restaurant Logically [x]
 
-- See Catergories
+- See Catergories [x]
 
 - Create Dish [x]
-- Edit Dish
-- Delete Dish
+- Edit Dish [x]
+- Delete Dish [x]
+
+## Orders Entity
+
+- customer
+- driver
+- restaurant
+- items
+- total
+- status
 
 ## Orders CRUD
+
+- Create Order [x]
+- See Order (pagination)
 
 ## Orders Subscription ( Owner, Customer, Delivery )
 
