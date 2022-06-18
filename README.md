@@ -26,3 +26,17 @@ The Backend of Giber Eats
 - category
 - address
 - coverImage
+
+## Restaurant CRUD
+
+- Edit Restaurant
+- Delete Restaurant
+
+- See Catergories
+- See Restaurants by Category (pagination)
+- See Restaurants (pagination)
+- See Restaurant
+
+- Create Dish
+- Edit Dish
+- Delete Dish

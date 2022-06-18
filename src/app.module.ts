@@ -1,3 +1,4 @@
+import { CategoryRepository } from './restaurants/repositories/category.repository';
 import { Category } from './restaurants/entities/category.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';

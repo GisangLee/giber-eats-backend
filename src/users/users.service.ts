@@ -29,11 +29,7 @@ export class UsersService {
         // check that email dose not exist
 
         try {
-            const userExists = await this.users.findOne({
-                where:{
-                    email: createAccountInput.email
-                }
-            });
+            const userExists = await this.users.findOne({ email: createAccountInput.email });
 
             if(userExists){
                 // make error
@@ -75,15 +71,7 @@ export class UsersService {
 
         try {
             // find user with the email
-            const foundUser = await this.users.findOne({
-                where:{
-                    email: email
-                },
-                select: {
-                    id: true,
-                    password: true
-                }
-            });
+            const foundUser = await this.users.findOne({ email }, { select: ["id", "password"] });
 
             if (!foundUser){
                 return {
@@ -124,7 +112,7 @@ export class UsersService {
     async findById(id: number): Promise<UserProfileOutput>{
 
         try {
-            const user = await this.users.findOneBy({ id });
+            const user = await this.users.findOne({ id });
 
             if(user){
 
@@ -143,7 +131,7 @@ export class UsersService {
     }
 
     async editProfile(id: number, { email, password }: EditProfileInput): Promise<EditProfileOutput>{
-        const user = await this.users.findOneBy({ id });
+        const user = await this.users.findOne({ id });
 
         try {
             if (email){
