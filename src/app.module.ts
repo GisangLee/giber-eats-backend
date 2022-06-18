@@ -1,4 +1,4 @@
-import { CategoryRepository } from './restaurants/repositories/category.repository';
+import { Dish } from './restaurants/entities/dish.entity.';
 import { Category } from './restaurants/entities/category.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -10,7 +10,6 @@ import * as Joi from "joi";
 import { Restaurant } from './restaurants/entities/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { UsersModule } from './users/users.module';
-import { CommonModule } from './common/common.module';
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
@@ -43,7 +42,7 @@ import { MailModule } from './mail/mail.module';
             username: process.env.DB_username,
             password: process.env.DB_password,
             database: process.env.DB_database,
-            entities: [User, Verification, Restaurant, Category],
+            entities: [User, Verification, Restaurant, Category, Dish],
             synchronize: process.env.NODE_ENV !== "prod",
             logging: true
         }),
