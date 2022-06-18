@@ -1,3 +1,6 @@
+import { SearchRestaurantOuput, SearchRestaurantInput } from './dto/search-restaurant.dto';
+import { RestaurantOuput, RestaurantInput } from './dto/restaurant.dto';
+import { RestaurantsOutput, RestaurantsIput } from './dto/restaurants.dto';
 import { CategoryInput, CategoryOutput } from './dto/category.dto';
 import { AllCategoriesOutput } from './dto/all-categories.dto';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
@@ -42,6 +45,25 @@ export class RestaurantResolver{
     ): Promise<DeleteRestaurantOutput> {
         return this.restaurantService.deleteRestaurant(owner, deleteRestaurantInput);
     }
+
+    
+    @Role(["Any"])
+    @Query(returns => RestaurantsOutput)
+    restaurants(@Args("input") restaurantsInput: RestaurantsIput): Promise<RestaurantsOutput> {
+        return this.restaurantService.allRestaurants(restaurantsInput);
+    }
+    
+    @Role(["Any"])
+    @Query(returns => RestaurantOuput)
+    restaurant(@Args("input") restaurantInput: RestaurantInput): Promise<RestaurantOuput> {
+        return this.restaurantService.getRestaurantById(restaurantInput.restaurantId);
+    }
+
+    @Role(["Any"])
+    @Query(returns => SearchRestaurantOuput)
+    searchRestaurant(@Args("input") searchRestaurantInput: SearchRestaurantInput): Promise<SearchRestaurantOuput> {
+        return this.restaurantService.searchRestaurant(searchRestaurantInput);
+    }
 }
 
 
@@ -49,21 +71,22 @@ export class RestaurantResolver{
 export class CategoryResolver {
     constructor(private readonly restaurantService: RestaurantService) {}
 
-    @ResolveField(type => Number)
+    @ResolveField(returns => Number)
     restaurantCount(@Parent() category: Category): Promise<Number> {
         return this.restaurantService.countRestaurants(category);
     }
 
 
     @Role(["Any"])
-    @Query(type => AllCategoriesOutput)
+    @Query(returns => AllCategoriesOutput)
     allCategories(): Promise<AllCategoriesOutput> {
         return this.restaurantService.allCategories();
     }
 
     @Role(["Any"])
-    @Query(type => CategoryOutput)
-    category(@Args() categoryInput: CategoryInput): Promise<CategoryOutput> {
+    @Query(returns => CategoryOutput)
+    category(@Args('input') categoryInput: CategoryInput): Promise<CategoryOutput> {
         return this.restaurantService.findCategoryBySlug(categoryInput);
     }
+
 }

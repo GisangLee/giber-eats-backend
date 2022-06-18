@@ -30,8 +30,9 @@ The Backend of Giber Eats
 ## Restaurant CRUD
 
 - See Restaurant [x]
-- See Restaurants (pagination)
-- See Restaurants by Category (pagination)
+- See Restaurants (pagination) [x]
+- See Restaurants by Category (pagination) [x]
+- Search Restaurant [x]
 
 - Edit Restaurant [x]
 - Delete Restaurant Logically [x]
@@ -41,3 +42,9 @@ The Backend of Giber Eats
 - Create Dish
 - Edit Dish
 - Delete Dish
+
+## Orders CRUD
+
+## Orders Subscription ( Owner, Customer, Delivery )
+
+## Payment (Cron JOB)

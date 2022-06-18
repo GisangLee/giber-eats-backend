@@ -1,14 +1,16 @@
+import { SearchRestaurantInput, SearchRestaurantOuput } from './dto/search-restaurant.dto';
+import { RestaurantOuput } from './dto/restaurant.dto';
+import { RestaurantsIput, RestaurantsOutput } from './dto/restaurants.dto';
 import { CategoryOutput, CategoryInput } from './dto/category.dto';
 import { AllCategoriesOutput } from './dto/all-categories.dto';
 import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dto/delete-restaurant.dto';
-import { CategoryRepository } from './repositories/category.repository';
 import { EditRestaurantInput, EditRestaurantOutput } from './dto/edit-restaurant.dto';
 import { Category } from './entities/category.entity';
 import { User } from './../users/entities/user.entity';
 import { CreateRestaurantInputType, CreateRestaurantOutputType } from './dto/create-restaurant.dto';
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Like, Raw, Repository } from "typeorm";
 import { Restaurant } from "./entities/restaurant.entity";
 
 @Injectable()
@@ -22,23 +24,41 @@ export class RestaurantService {
         //private readonly categories: CategoryRepository,
     ){}
 
-    async getRestaurantById(id): Promise<Restaurant> {
-        const restaurant = this.restaurants.findOne({ id, isDeleted: false });
-        return restaurant;
+    async getRestaurantById(id: number): Promise<RestaurantOuput> {
+        try {
+            const restaurant = await this.restaurants.findOne({ id, isDeleted: false });
+
+            if (!restaurant) {
+                return {
+                    ok: false,
+                    error: "가게를 찾을 수 없습니다."
+                };
+            }
+
+            return {
+                ok: true,
+                restaurant
+            };
+            
+        } catch (error) {
+            return {
+                ok: false,
+                error,
+            };
+        }
     }
 
     async checkRestaurantExists(owner, restaurantInput): Promise<any>{
 
-        const restaurant = await this.getRestaurantById(restaurantInput.restaurantId);
+        const { ok, error, restaurant } = await this.getRestaurantById(restaurantInput.restaurantId);
         console.log("res", restaurant);
         //const restaurant = await this.restaurants.findOne({ id: restaurantInput.restaurantId });
 
         if (!restaurant) {
             return {
-                ok: false,
-                error: "가게를 찾을 수 없습니다."
+                ok,
+                error
             };
-
         }
 
         if (owner.id !== restaurant.ownerId) {
@@ -189,16 +209,13 @@ export class RestaurantService {
         }
     }
 
-    async countRestaurants(category: Category): Promise<Number> {
-        return await this.restaurants.count({ category });
+    countRestaurants(category: Category) {
+        return this.restaurants.count({ category });
     }
 
-    async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+    async findCategoryBySlug({ slug, page }: CategoryInput): Promise<CategoryOutput> {
         try {
-            const category = await this.categories.findOne(
-                { slug },
-                { relations: ["restaurants"] }
-            );
+            const category = await this.categories.findOne({ slug });
 
             if (!category) {
                 return {
@@ -207,11 +224,96 @@ export class RestaurantService {
                 };
             }
 
+            // pagination
+            const restaurants = await this.restaurants.find({
+                where: {
+                    category,
+                    isDeleted: false,                    
+                },
+                take: 25,
+                skip: ( page - 1) * 25,
+            });
+
+            category.restaurants = restaurants;
+
+            const totalResults = await this.countRestaurants(category);
+
             return {
                 ok: true,
-                category
+                category,
+                restaurants,
+                totalPages: Math.ceil(totalResults / 25),
             };
 
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async allRestaurants({ page }: RestaurantsIput): Promise<RestaurantsOutput> {
+        try {
+
+            const [restaurants, totalResults] = await this.restaurants.findAndCount({
+                where: {
+                    isDeleted: false,       
+                },
+                take: 25,
+                skip: (page - 1) * 25,
+            });
+
+            const totalPages = Math.ceil(totalResults / 25);
+
+            if (!restaurants) {
+                return {
+                    ok: false,
+                    error: "가게가 없습니다.",
+                    totalPages,
+                };
+            }
+
+            return {
+                ok: true,
+                totalPages,
+                restaurants
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async searchRestaurant({ query, page }: SearchRestaurantInput): Promise<SearchRestaurantOuput> {
+        try {
+            const [restaurants, totalResults] = await this.restaurants.findAndCount({
+                where: {
+                    name: Raw(name => `${name} ILIKE '%${query}%'`)
+                },
+                take: 25,
+                skip: (page - 1) * 25,
+                
+            });
+
+            if (!restaurants) {
+                return {
+                    ok: true,
+                    error: "가게가 없습니다."
+                };
+            }
+
+            const totalPages = Math.ceil(totalResults / 25);
+
+            return {
+                ok: true,
+                totalPages,
+                restaurants
+            }
+            
         } catch (error) {
             return {
                 ok: false,
