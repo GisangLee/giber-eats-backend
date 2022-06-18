@@ -1,3 +1,5 @@
+import { DeleteDishInput, DeleteDishOuput } from './dto/delete-dish.dto';
+import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
 import { Dish } from './entities/dish.entity.';
 import { CreateDishInput, CreateDishOuput } from './dto/create-dish.dto';
 import { SearchRestaurantInput, SearchRestaurantOuput } from './dto/search-restaurant.dto';
@@ -52,6 +54,32 @@ export class RestaurantService {
                 error,
             };
         }
+    }
+
+    async checkDishExists(owner, dishInput): Promise<any> {
+        const dish = await this.dishes.findOne(
+            { isDeleted: false, id: dishInput.dishId },
+            { relations: ["restaurant"] }
+        );
+
+        if (!dish) {
+            return {
+                ok: false,
+                error: "음식을 찾을 수 없습니다."
+            };
+        }
+
+        if (owner.id !== dish.restaurant.ownerId) {
+            return {
+                ok: false,
+                error: "권한이 없습니다."
+            };
+        }
+
+        return {
+            ok: true,
+            dish
+        };
     }
 
     async checkRestaurantExists(owner, restaurantInput): Promise<any>{
@@ -136,7 +164,7 @@ export class RestaurantService {
         try {
             const { ok, error, restaurant } = await this.checkRestaurantExists(owner, editRestaurantInput);
 
-            if (!ok) {
+            if (!ok || !restaurant) {
                 return {
                     ok,
                     error
@@ -350,6 +378,63 @@ export class RestaurantService {
                 ok: true,
             };
 
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async editDish(owner: User, editDishInput:EditDishInput): Promise<EditDishOutput> {
+        try {
+            const { ok, error, dish } = await this.checkDishExists(owner, editDishInput);
+
+            if (!ok || !dish) {
+                return {
+                    ok,
+                    error
+                };
+            }
+
+            await this.dishes.save([
+                {
+                    id: editDishInput.dishId,
+                    ...editDishInput
+                }
+            ]);
+
+            return {
+                ok: true
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async deleteDish(owner: User, deleteDishInput: DeleteDishInput): Promise<DeleteDishOuput> {
+        try {
+
+            const { ok, error, dish } = await this.checkDishExists(owner, deleteDishInput);
+
+            if (!ok || !dish) {
+                return {
+                    ok,
+                    error
+                };
+            }
+
+            dish.isDeleted = true;
+            await this.dishes.save(dish);
+
+            return {
+                ok: true
+            };
+            
         } catch (error) {
             return {
                 ok: false,
