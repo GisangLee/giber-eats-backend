@@ -39,7 +39,7 @@ The Backend of Giber Eats
 
 - See Catergories
 
-- Create Dish
+- Create Dish [x]
 - Edit Dish
 - Delete Dish
 

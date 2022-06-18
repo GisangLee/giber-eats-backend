@@ -1,3 +1,5 @@
+import { Dish } from './entities/dish.entity.';
+import { CreateDishInput, CreateDishOuput } from './dto/create-dish.dto';
 import { SearchRestaurantInput, SearchRestaurantOuput } from './dto/search-restaurant.dto';
 import { RestaurantOuput } from './dto/restaurant.dto';
 import { RestaurantsIput, RestaurantsOutput } from './dto/restaurants.dto';
@@ -20,13 +22,17 @@ export class RestaurantService {
         @InjectRepository(Restaurant)
         private readonly restaurants: Repository<Restaurant>,
         @InjectRepository(Category)
-        private readonly categories: Repository<Category>
-        //private readonly categories: CategoryRepository,
+        private readonly categories: Repository<Category>,
+        @InjectRepository(Dish)
+        private readonly dishes: Repository<Dish>
     ){}
 
     async getRestaurantById(id: number): Promise<RestaurantOuput> {
         try {
-            const restaurant = await this.restaurants.findOne({ id, isDeleted: false });
+            const restaurant = await this.restaurants.findOne(
+                { id, isDeleted: false },
+                { relations: ["menu"] }
+            );
 
             if (!restaurant) {
                 return {
@@ -314,6 +320,36 @@ export class RestaurantService {
                 restaurants
             }
             
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async createDish(owner: User, createDishInput: CreateDishInput): Promise<CreateDishOuput> {
+        try {
+
+            const { ok, error, restaurant } = await this.checkRestaurantExists(owner, createDishInput);
+
+            if (!ok || !restaurant) {
+                return {
+                    ok,
+                    error
+                };
+            }
+
+            const dish = await this.dishes.save(
+                this.dishes.create({ ...createDishInput, restaurant })
+            );
+
+            console.log("dish", dish);
+
+            return {
+                ok: true,
+            };
+
         } catch (error) {
             return {
                 ok: false,
