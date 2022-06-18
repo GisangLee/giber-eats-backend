@@ -1,3 +1,4 @@
+import { Order } from './../../orders/entities/order.entity';
 import { Dish } from './dish.entity.';
 import { User } from './../../users/entities/user.entity';
 import { Category } from './category.entity';
@@ -43,6 +44,10 @@ export class Restaurant extends CoreEntity {
     @OneToMany(type => Dish, dish => dish.restaurant)
     @Field(type => [Dish], { nullable: true })
     menu: Dish[];
+
+    @OneToMany(type => Order, order => order.restaurant)
+    @Field(type => [Order])
+    orders: Order[];
 
     @RelationId((restaurant: Restaurant) => restaurant.owner)
     ownerId: number;

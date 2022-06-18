@@ -1,3 +1,4 @@
+import { Order } from './../../orders/entities/order.entity';
 import { Restaurant } from './../../restaurants/entities/restaurant.entity';
 import { Field, InputType, ObjectType, registerEnumType } from "@nestjs/graphql";
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, OneToMany } from "typeorm";
@@ -45,6 +46,14 @@ export class User extends CoreEntity {
     @OneToMany(type => Restaurant, restaurant => restaurant.owner)
     @Field(type => [Restaurant])
     restaurants: Restaurant[];
+
+    @OneToMany(type => Order, order => order.customer)
+    @Field(type => [Order])
+    orders: Order[];
+
+    @OneToMany(type => Order, order => order.driver)
+    @Field(type => [Order])
+    riders: Order[];
 
     @BeforeInsert()
     @BeforeUpdate()

@@ -1,3 +1,5 @@
+import { OrderItem } from './orders/entities/order-item.entity';
+import { Order } from './orders/entities/order.entity';
 import { Dish } from './restaurants/entities/dish.entity.';
 import { Category } from './restaurants/entities/category.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
@@ -15,6 +17,7 @@ import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
     imports: [
@@ -42,7 +45,7 @@ import { MailModule } from './mail/mail.module';
             username: process.env.DB_username,
             password: process.env.DB_password,
             database: process.env.DB_database,
-            entities: [User, Verification, Restaurant, Category, Dish],
+            entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
             synchronize: process.env.NODE_ENV !== "prod",
             logging: true
         }),
@@ -62,6 +65,7 @@ import { MailModule } from './mail/mail.module';
         AuthModule,
         UsersModule,
         RestaurantsModule,
+        OrdersModule,
     ],
     controllers: [],
     providers: [],
