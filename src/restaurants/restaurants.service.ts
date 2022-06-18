@@ -1,3 +1,5 @@
+import { CategoryOutput, CategoryInput } from './dto/category.dto';
+import { AllCategoriesOutput } from './dto/all-categories.dto';
 import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dto/delete-restaurant.dto';
 import { CategoryRepository } from './repositories/category.repository';
 import { EditRestaurantInput, EditRestaurantOutput } from './dto/edit-restaurant.dto';
@@ -52,7 +54,7 @@ export class RestaurantService {
         };
     }
 
-    async getOrCreate(categoryName: string): Promise<Category> {
+    async getOrCreateCategory(categoryName: string): Promise<Category> {
         const cateogryName = categoryName.trim().toLowerCase();
         const categorySlug = cateogryName.replace(/ /g, "-");
 
@@ -77,7 +79,7 @@ export class RestaurantService {
         try{
             const newRestaurant = this.restaurants.create(createRestaurantInputType);
 
-            const category = await this.getOrCreate(createRestaurantInputType.categoryName);
+            const category = await this.getOrCreateCategory(createRestaurantInputType.categoryName);
 
             newRestaurant.category = category;
 
@@ -118,7 +120,7 @@ export class RestaurantService {
             let category: Category = null;
 
             if (editRestaurantInput.categoryName) {
-                category = await this.getOrCreate(editRestaurantInput.categoryName);
+                category = await this.getOrCreateCategory(editRestaurantInput.categoryName);
             }
 
             await this.restaurants.save([{
@@ -161,6 +163,53 @@ export class RestaurantService {
 
             return {
                 ok: true
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async allCategories():Promise<AllCategoriesOutput> {
+        try {
+            const categories = await this.categories.find();
+            return {
+                ok: true,
+                categories
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async countRestaurants(category: Category): Promise<Number> {
+        return await this.restaurants.count({ category });
+    }
+
+    async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+        try {
+            const category = await this.categories.findOne(
+                { slug },
+                { relations: ["restaurants"] }
+            );
+
+            if (!category) {
+                return {
+                    ok: false,
+                    error: "카테고리를 찾을 수 없습니다."
+                };
+            }
+
+            return {
+                ok: true,
+                category
             };
 
         } catch (error) {

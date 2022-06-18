@@ -14,11 +14,11 @@ The Backend of Giber Eats
 
 ## User CRUD
 
-- Create Account
-- Log in
-- See Profile
-- Edit Profile
-- Verify Email
+- Create Account [x]
+- Log in [x]
+- See Profile [x]
+- Edit Profile [x]
+- Verify Email [x]
 
 ## Restaurant Model
 
@@ -29,13 +29,14 @@ The Backend of Giber Eats
 
 ## Restaurant CRUD
 
-- Edit Restaurant
-- Delete Restaurant
+- See Restaurant [x]
+- See Restaurants (pagination)
+- See Restaurants by Category (pagination)
+
+- Edit Restaurant [x]
+- Delete Restaurant Logically [x]
 
 - See Catergories
-- See Restaurants by Category (pagination)
-- See Restaurants (pagination)
-- See Restaurant
 
 - Create Dish
 - Edit Dish
