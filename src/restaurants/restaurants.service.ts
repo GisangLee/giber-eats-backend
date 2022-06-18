@@ -1,3 +1,4 @@
+import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dto/delete-restaurant.dto';
 import { CategoryRepository } from './repositories/category.repository';
 import { EditRestaurantInput, EditRestaurantOutput } from './dto/edit-restaurant.dto';
 import { Category } from './entities/category.entity';
@@ -18,6 +19,38 @@ export class RestaurantService {
         private readonly categories: Repository<Category>
         //private readonly categories: CategoryRepository,
     ){}
+
+    async getRestaurantById(id): Promise<Restaurant> {
+        const restaurant = this.restaurants.findOne({ id, isDeleted: false });
+        return restaurant;
+    }
+
+    async checkRestaurantExists(owner, restaurantInput): Promise<any>{
+
+        const restaurant = await this.getRestaurantById(restaurantInput.restaurantId);
+        console.log("res", restaurant);
+        //const restaurant = await this.restaurants.findOne({ id: restaurantInput.restaurantId });
+
+        if (!restaurant) {
+            return {
+                ok: false,
+                error: "가게를 찾을 수 없습니다."
+            };
+
+        }
+
+        if (owner.id !== restaurant.ownerId) {
+            return {
+                ok: false,
+                error: "권한이 없습니다."
+            };
+        }
+
+        return {
+            ok: true,
+            restaurant
+        };
+    }
 
     async getOrCreate(categoryName: string): Promise<Category> {
         const cateogryName = categoryName.trim().toLowerCase();
@@ -73,19 +106,12 @@ export class RestaurantService {
     ): Promise<EditRestaurantOutput> {
 
         try {
-            const restaurant = await this.restaurants.findOne({ id: editRestaurantInput.restaurantId });
+            const { ok, error, restaurant } = await this.checkRestaurantExists(owner, editRestaurantInput);
 
-            if (!restaurant) {
+            if (!ok) {
                 return {
-                    ok: false,
-                    error: "가게를 찾지 못했습니다."
-                };
-            }
-
-            if (owner.id !== restaurant.ownerId) {
-                return {
-                    ok: false,
-                    error: "권한이 없습니다."
+                    ok,
+                    error
                 };
             }
 
@@ -113,5 +139,35 @@ export class RestaurantService {
             };
         }
 
+    }
+
+    async deleteRestaurant(owner: User, deleteRestaurantInput: DeleteRestaurantInput): Promise<DeleteRestaurantOutput> {
+        try {
+
+            const { ok, error, restaurant } = await this.checkRestaurantExists(owner, deleteRestaurantInput);
+
+            if (!ok) {
+                return {
+                    ok,
+                    error
+                 };
+            }
+
+            //this.restaurants.delete(restaurant.id);
+
+            // 논리 삭제
+            restaurant.isDeleted = true;
+            this.restaurants.save(restaurant);
+
+            return {
+                ok: true
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
     }
 }

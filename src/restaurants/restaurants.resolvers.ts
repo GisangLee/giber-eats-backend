@@ -1,3 +1,4 @@
+import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dto/delete-restaurant.dto';
 import { EditRestaurantOutput, EditRestaurantInput } from './dto/edit-restaurant.dto';
 import { User } from './../users/entities/user.entity';
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
@@ -28,5 +29,14 @@ export class RestaurantResolver{
         @Args("input") editRestaurantInput: EditRestaurantInput
     ): Promise<EditRestaurantOutput> {
         return this.restaurantService.editRestaurant(owner, editRestaurantInput);
+    }
+
+    @Role(["Owner"])
+    @Mutation(returns => DeleteRestaurantOutput)
+    deleteRestaurant(
+        @AuthUser() owner: User,
+        @Args("input") deleteRestaurantInput: DeleteRestaurantInput
+    ): Promise<DeleteRestaurantOutput> {
+        return this.restaurantService.deleteRestaurant(owner, deleteRestaurantInput);
     }
 }
