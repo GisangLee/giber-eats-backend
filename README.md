@@ -55,7 +55,9 @@ The Backend of Giber Eats
 ## Orders CRUD
 
 - Create Order [x]
-- See Order (pagination)
+- See Orders (pagination) [x]
+- See Order [x]
+- Edit Order (Owner, Delivery) [x]
 
 ## Orders Subscription ( Owner, Customer, Delivery )
 

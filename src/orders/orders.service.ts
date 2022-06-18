@@ -1,3 +1,4 @@
+import { EditOrderInput, EditOrderOutput } from './dto/edit-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dto/get-order.dto';
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -6,7 +7,7 @@ import { Dish } from './../restaurants/entities/dish.entity.';
 import { OrderItem } from './entities/order-item.entity';
 import { Restaurant } from './../restaurants/entities/restaurant.entity';
 import { User, UserRole } from './../users/entities/user.entity';
-import { Order } from './entities/order.entity';
+import { Order, OrderStatus } from './entities/order.entity';
 import { GetOrdersInput, GetOrdersOutput } from './dto/get-orders.dto';
 import { CreateOrderInput, CreateOrderOutput } from './dto/create-order.dto';
 
@@ -166,6 +167,23 @@ export class OrderService {
         }
     }
 
+    notAllowed(user, order): boolean {
+        let notAllowed: boolean = false;
+
+        if (user.role === UserRole.Client && order.customerId !== user.id) {
+            notAllowed = true;
+        }
+
+        if (user.role === UserRole.Delivery && order.driverId !== user.id) {
+            notAllowed = true;
+        }
+
+        if (user.role === UserRole.Owner && order.restaurant.ownerId !== user.id) {
+            notAllowed = true;
+        }
+        return notAllowed;
+    }
+
     async getOrderById(user: User, { id: orderId }: GetOrderInput): Promise<GetOrderOutput> {
         try {
 
@@ -181,21 +199,7 @@ export class OrderService {
                 };
             }
 
-            let notAllowed: boolean = false;
-
-            if (user.role === UserRole.Client && order.customerId !== user.id) {
-                notAllowed = true;
-            }
-
-            if (user.role === UserRole.Delivery && order.driverId !== user.id) {
-                notAllowed = true;
-            }
-
-            if (user.role === UserRole.Owner && order.restaurant.ownerId !== user.id) {
-                notAllowed = true;
-            }
-
-            if (notAllowed) {
+            if (this.notAllowed(user, order)) {
                 return {
                     ok: false,
                     error: "권한이 없습니다."
@@ -205,6 +209,66 @@ export class OrderService {
             return {
                 ok: true,
                 order,
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async editOrder(user: User, { id: orderId, status }: EditOrderInput): Promise<EditOrderOutput> {
+        try {
+
+            const order = await this.orders.findOne(
+                { id: orderId },
+                { relations: ["restaurant"] }
+            );
+
+            if (!order) {
+                return {
+                    ok: false,
+                    error: "주문을 찾을 수 없습니다."
+                };
+            }
+
+            if (this.notAllowed(user, order)) {
+                return {
+                    ok: false,
+                    error: "권한이 없습니다."
+                };
+            }
+
+            let canEdit = true;
+
+            if (user.role === UserRole.Owner) {
+                if (status !== OrderStatus.Cooking && status !== OrderStatus.Cooked) {
+                    canEdit = false;
+                }
+            }
+
+            if (user.role === UserRole.Delivery) {
+                if (status !== OrderStatus.PickedUp && status !== OrderStatus.Delivered) {
+                    canEdit = false;
+                }
+            }
+
+            if (!canEdit) {
+                return {
+                    ok: false,
+                    error: "권한이 없습니다."
+                };
+            }
+
+            await this.orders.save([{
+                id: orderId,
+                status: status,
+            }]);
+
+            return {
+                ok: true,
             };
 
         } catch (error) {

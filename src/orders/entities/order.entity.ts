@@ -9,6 +9,7 @@ import { CoreEntity } from './../../common/entities/core.entity';
 export enum OrderStatus {
     Pending = "주문 확인 중",
     Cooking = "요리 중",
+    Cooked = "요리 완료",
     PickedUp = "기사님 픽업",
     Delivered = "배달 완료",
 };
