@@ -1,3 +1,4 @@
+import { Category } from './restaurants/entities/category.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
@@ -41,7 +42,7 @@ import { MailModule } from './mail/mail.module';
             username: process.env.DB_username,
             password: process.env.DB_password,
             database: process.env.DB_database,
-            entities: [User, Verification],
+            entities: [User, Verification, Restaurant, Category],
             synchronize: process.env.NODE_ENV !== "prod",
             logging: true
         }),
@@ -58,7 +59,9 @@ import { MailModule } from './mail/mail.module';
             domain: process.env.MAILGUN_DOMAIN_NAME,
             fromEmail: process.env.MAILGUN_FROM_EMAIL,
         }),
+        AuthModule,
         UsersModule,
+        RestaurantsModule,
     ],
     controllers: [],
     providers: [],
