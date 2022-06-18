@@ -53,7 +53,7 @@ export class UsersService {
                 }),
             );
 
-            this.mailService.sendVerificationEmail(user.email, verification.code);
+            //this.mailService.sendVerificationEmail(user.email, verification.code);
 
             return {
                 ok: true
@@ -151,7 +151,7 @@ export class UsersService {
                 user.verified = false;
                 const verification = await this.verification.save(this.verification.create({ user }));
 
-                this.mailService.sendVerificationEmail(email, verification.code);
+                //this.mailService.sendVerificationEmail(email, verification.code);
             }
             if (password){
                 user.password = password;

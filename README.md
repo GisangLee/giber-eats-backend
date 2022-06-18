@@ -19,3 +19,10 @@ The Backend of Giber Eats
 - See Profile
 - Edit Profile
 - Verify Email
+
+## Restaurant Model
+
+- name
+- category
+- address
+- coverImage
