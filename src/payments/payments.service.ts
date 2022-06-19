@@ -1,11 +1,12 @@
+import { Cron } from '@nestjs/schedule';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { GetPaymentsOutput } from './dto/get-payments.dto';
 import { Restaurant } from './../restaurants/entities/restaurant.entity';
 import { User } from './../users/entities/user.entity';
 import { CreatePaymentInput, CreatePaymentOutput } from './dto/create-payment.dto';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
 
 
 @Injectable()
@@ -16,6 +17,8 @@ export class PaymentService {
 
         @InjectRepository(Restaurant)
         private readonly restaurants: Repository<Restaurant>
+
+
 
     ) {}
 
@@ -44,6 +47,14 @@ export class PaymentService {
                 restaurant,
             }));
 
+            const date = new Date();
+            date.setDate(date.getDate() + 7);
+
+            restaurant.isPromoted = true;
+            restaurant.promotedUntil = date;
+
+            await this.restaurants.save(restaurant);
+
             return {
                 ok: true
             };
@@ -70,6 +81,22 @@ export class PaymentService {
                 ok: false,
                 error
             };
+        }
+    }
+
+    @Cron("0 50 23 * * *")
+    async checkPromotedRestaurants() {
+        try {
+            const restaurants = await this.restaurants.find({ isPromoted: true, isDeleted: false, promotedUntil: LessThan(new Date())});
+
+            restaurants.forEach(async restaurant => {
+                restaurant.isPromoted = false;
+                restaurant.promotedUntil = null;
+                await this.restaurants.save(restaurant);
+            });
+
+        } catch (error) {
+            
         }
     }
 }

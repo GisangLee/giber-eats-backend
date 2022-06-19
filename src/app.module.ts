@@ -1,16 +1,16 @@
+import { ScheduleModule } from '@nestjs/schedule';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import * as Joi from "joi";
 import { Payment } from './payments/entities/payment.entity';
 import { CommonModule } from './common/common.module';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { Order } from './orders/entities/order.entity';
 import { Dish } from './restaurants/entities/dish.entity.';
 import { Category } from './restaurants/entities/category.entity';
-import { JwtMiddleware } from './jwt/jwt.middleware';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import * as Joi from "joi";
 import { Restaurant } from './restaurants/entities/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { UsersModule } from './users/users.module';
@@ -78,6 +78,7 @@ import { PaymentsModule } from './payments/payments.module';
                 }
             },
         }),
+        ScheduleModule.forRoot(),
         JwtModule.forRoot({
             privateKey: process.env.SECRET_KEY
         }),
