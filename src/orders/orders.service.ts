@@ -1,5 +1,5 @@
 import { PubSub } from 'graphql-subscriptions';
-import { PUB_SUB, NEW_PENDING_ORDER } from './../common/common.constants';
+import { PUB_SUB, NEW_PENDING_ORDER, NEW_COOKED_ORDER, NEW_ORDER_UPDATE } from './../common/common.constants';
 import { EditOrderInput, EditOrderOutput } from './dto/edit-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dto/get-order.dto';
 import { Inject, Injectable } from "@nestjs/common";
@@ -229,10 +229,7 @@ export class OrderService {
     async editOrder(user: User, { id: orderId, status }: EditOrderInput): Promise<EditOrderOutput> {
         try {
 
-            const order = await this.orders.findOne(
-                { id: orderId },
-                { relations: ["restaurant"] }
-            );
+            const order = await this.orders.findOne({ id: orderId });
 
             if (!order) {
                 return {
@@ -269,10 +266,20 @@ export class OrderService {
                 };
             }
 
-            await this.orders.save([{
+            await this.orders.save({
                 id: orderId,
                 status: status,
-            }]);
+            });
+
+            const newOrder = { ...order, status};
+
+            if (user.role === UserRole.Owner) {
+                if (status === OrderStatus.Cooked) {
+                    await this.pubSub.publish(NEW_COOKED_ORDER, { cookedOrders:newOrder });
+                }    
+            }
+
+            await this.pubSub.publish(NEW_ORDER_UPDATE, { orderUpdates: newOrder });
 
             return {
                 ok: true,
