@@ -1,3 +1,4 @@
+import { TakeOrderInput, TakeOrderOutput } from './dto/take-order.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { PUB_SUB, NEW_PENDING_ORDER, NEW_COOKED_ORDER, NEW_ORDER_UPDATE } from './../common/common.constants';
 import { EditOrderInput, EditOrderOutput } from './dto/edit-order.dto';
@@ -283,6 +284,44 @@ export class OrderService {
 
             return {
                 ok: true,
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error
+            };
+        }
+    }
+
+    async takeOrder(driver: User, { id: orderId }: TakeOrderInput): Promise<TakeOrderOutput> {
+        try {
+
+            const order = await this.orders.findOne({ id: orderId });
+
+            if (!order) {
+                return {
+                    ok: false,
+                    error: "주문이 없습니다."
+                };
+            }
+
+            if (order.driver) {
+                return {
+                    ok: false,
+                    error: "기사님이 이미 배정된 주문입니다."
+                };
+            }
+
+            await this.orders.save({
+                id: orderId,
+                driver,
+            });
+
+            await this.pubSub.publish(NEW_ORDER_UPDATE, { orderUpdates: { ...order, driver } });
+
+            return {
+                ok: true
             };
 
         } catch (error) {
