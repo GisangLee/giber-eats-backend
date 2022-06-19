@@ -65,6 +65,7 @@ export class OrderResolver {
     orderSubscription(
         @AuthUser() user: User
     ) {
+        console.log("logged in user", user);
         return pubsub.asyncIterator("hotPotatos");
     }
 }
