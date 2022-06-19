@@ -1,3 +1,4 @@
+import { Payment } from './payments/entities/payment.entity';
 import { CommonModule } from './common/common.module';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { Order } from './orders/entities/order.entity';
@@ -19,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
     imports: [
@@ -46,7 +48,7 @@ import { OrdersModule } from './orders/orders.module';
             username: process.env.DB_username,
             password: process.env.DB_password,
             database: process.env.DB_database,
-            entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
+            entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment],
             synchronize: process.env.NODE_ENV !== "prod",
             logging: true
         }),
@@ -89,6 +91,7 @@ import { OrdersModule } from './orders/orders.module';
         RestaurantsModule,
         OrdersModule,
         CommonModule,
+        PaymentsModule,
     ],
     controllers: [],
     providers: [],

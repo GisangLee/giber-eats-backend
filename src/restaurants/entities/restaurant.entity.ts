@@ -1,3 +1,4 @@
+import { Payment } from './../../payments/entities/payment.entity';
 import { Order } from './../../orders/entities/order.entity';
 import { Dish } from './dish.entity.';
 import { User } from './../../users/entities/user.entity';

@@ -65,6 +65,6 @@ The Backend of Giber Eats
 - Order Status (Customer, Delivery, Owner) (s: orderUpdate) (t: editOrder(orderUpdate)) [x]
 - Pending PickUp Order (Delivery) (s: orderupdate) (t: editOrder(orderUpdate)) [x]
 
-## Payment (Cron JOB)
+## Payment (Cron JOB) with Paddle
 
-- Payment
+- Promote restaurant
