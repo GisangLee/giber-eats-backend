@@ -61,4 +61,8 @@ The Backend of Giber Eats
 
 ## Orders Subscription ( Owner, Customer, Delivery )
 
+- Pending Orders (s: newOrder) (t: createOrder(newOrder)) [x]
+- Order Status (Customer, Delivery, Onwer) (s: orderUpdate) (t: editOrder(orderUpdate))
+- Pending PickUp Order (Delivery) (s: orderupdate) (t: editOrder(orderUpdate))
+
 ## Payment (Cron JOB)

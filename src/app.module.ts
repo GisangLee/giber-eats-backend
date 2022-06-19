@@ -1,3 +1,4 @@
+import { CommonModule } from './common/common.module';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { Order } from './orders/entities/order.entity';
 import { Dish } from './restaurants/entities/dish.entity.';
@@ -53,7 +54,6 @@ import { OrdersModule } from './orders/orders.module';
             subscriptions: {
                 'subscriptions-transport-ws': {
                     onConnect: (connectionParams) => {
-                        console.log("connectionParams", connectionParams);
                         const authToken = connectionParams['X-JWT'];
 
                         if (!authToken) {
@@ -88,6 +88,7 @@ import { OrdersModule } from './orders/orders.module';
         UsersModule,
         RestaurantsModule,
         OrdersModule,
+        CommonModule,
     ],
     controllers: [],
     providers: [],
