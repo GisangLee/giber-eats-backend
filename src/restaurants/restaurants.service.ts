@@ -349,7 +349,8 @@ export class RestaurantService {
             return {
                 ok: true,
                 totalPages,
-                restaurants
+                restaurants,
+                totalResults
             }
             
         } catch (error) {
