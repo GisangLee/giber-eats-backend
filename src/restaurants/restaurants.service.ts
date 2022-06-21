@@ -278,6 +278,7 @@ export class RestaurantService {
                 category,
                 restaurants,
                 totalPages: Math.ceil(totalResults / 25),
+                totalResults
             };
 
         } catch (error) {
