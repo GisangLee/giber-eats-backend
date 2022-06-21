@@ -307,13 +307,15 @@ export class RestaurantService {
                     ok: false,
                     error: "가게가 없습니다.",
                     totalPages,
+                    totalResults,
                 };
             }
 
             return {
                 ok: true,
                 totalPages,
-                restaurants
+                restaurants,
+                totalResults
             };
 
         } catch (error) {
