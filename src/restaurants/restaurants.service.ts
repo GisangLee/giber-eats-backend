@@ -16,6 +16,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Raw, Repository } from "typeorm";
 import { Restaurant } from "./entities/restaurant.entity";
+import { MyRestaurantsOutput } from './dto/myRestaurants.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -445,6 +446,25 @@ export class RestaurantService {
             return {
                 ok: false,
                 error
+            };
+        }
+    }
+
+    async myRestaurants (owner: User): Promise<MyRestaurantsOutput> {
+
+        try {
+
+            const restaurants = await this.restaurants.find({ owner });
+
+            return {
+                ok: true,
+                restaurants
+            };
+
+        } catch (error) {
+            return {
+                ok: false,
+                error: "가게를 찾을 수 없습니다"
             };
         }
     }
