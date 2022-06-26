@@ -69,6 +69,14 @@ export class RestaurantResolver{
     searchRestaurant(@Args("input") searchRestaurantInput: SearchRestaurantInput): Promise<SearchRestaurantOuput> {
         return this.restaurantService.searchRestaurant(searchRestaurantInput);
     }
+
+    @Role(["Owner"])
+    @Query(returns => MyRestaurantsOutput)
+    myRestaurants(
+        @AuthUser() owner:User
+    ): Promise<MyRestaurantsOutput> {
+        return this.restaurantService.myRestaurants(owner);
+    }
 }
 
 
@@ -127,13 +135,5 @@ export class DishResolver {
         @Args("input") deleteDishInput: DeleteDishInput
     ): Promise<DeleteDishOuput> {
         return this.restaurantService.deleteDish(owner, deleteDishInput);
-    }
-
-    @Role(["Owner"])
-    @Mutation(returns => MyRestaurantsOutput)
-    myRestaurants(
-        @AuthUser() owner:User
-    ): Promise<MyRestaurantsOutput> {
-        return this.restaurantService.myRestaurants(owner);
     }
 }
