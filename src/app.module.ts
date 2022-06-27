@@ -21,6 +21,7 @@ import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
     imports: [
@@ -39,6 +40,9 @@ import { PaymentsModule } from './payments/payments.module';
                 MAILGUN_API_KEY: Joi.string().required(),
                 MAILGUN_DOMAIN_NAME: Joi.string().required(),
                 MAILGUN_FROM_EMAIL: Joi.string().required(),
+                accessKeyId: Joi.string().required(),
+                secretAccessKey: Joi.string().required(),
+                bucketName: Joi.string().required(),
             })
         }),
         TypeOrmModule.forRoot({
@@ -93,6 +97,7 @@ import { PaymentsModule } from './payments/payments.module';
         OrdersModule,
         CommonModule,
         PaymentsModule,
+        UploadsModule,
     ],
     controllers: [],
     providers: [],
