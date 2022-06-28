@@ -144,6 +144,7 @@ export class RestaurantService {
 
             return {
                 ok: true,
+                restaurantId: newRestaurant.id
             };
 
         } catch(error){
