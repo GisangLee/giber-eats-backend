@@ -473,13 +473,13 @@ export class RestaurantService {
 
     async myRestaurant (owner: User, { id }: MyRestaurantInput) {
         try {
-            const restaurant = await this.restaurants.findOne({ owner, id });
+            const restaurant = await this.restaurants.findOne({ owner, id }, { relations: ["menu"] });
 
             return {
                 ok:true,
                 restaurant
             };
-            
+
         } catch (error) {
             
             return {
